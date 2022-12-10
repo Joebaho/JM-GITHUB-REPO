@@ -33,13 +33,13 @@ Parameters:
 Mappings: 
  RegionMap:
    us-west-2:
-    "HVM64":  "ami-094125af156557ca2" 
+    "HVM64":  "ami-094125af156557ca2" # Oregon
    us-east-2:
-    "HVM64": "ami-0beaa649c482330f7" 
+    "HVM64": "ami-0beaa649c482330f7" # Ohio 
    us-east-1:
-    "HVM64": "ami-0b0dcb5067f052a63" 
+    "HVM64": "ami-0b0dcb5067f052a63" #North Virginia 
    us-west-1:
-    "HVM64": "ami-0f5e8a042c8bfcd5e"  
+    "HVM64": "ami-0f5e8a042c8bfcd5e"  #North California 
 
 Resources:
   MyEC2Instance:
