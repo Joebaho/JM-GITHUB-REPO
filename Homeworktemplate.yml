@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: -|
+   This template will use Instructor Claudio's Template named SampleNetwokCrossStack 
+   and display another using cross stack reference.
+
+Metadata: 
+ Authors:
+    Description: Joseph Mbatchou  # The writer of this template
+
+Parameters: 
+ InstanceType:
+    Description: WebServer EC2 instance type (has default, AllowedValues)
+    Type: String
+    AllowedValues: # choose between all t2 category 
+      - t2.large
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.xlarge
+      - t2.2xlarge
+      - t2.medium
+
+ KeyName:
+    Description: Name of existing EC2 KeyPair to enable SSH access to new instances
+    Type: AWS::EC2::KeyPair::KeyName #pulls all keys u have in Region/identifier
+    ConstraintDescription: must be the name of an existing EC2 keypair  
+
+ NetworkStackName: 
+    Description: This the name of the network imported # any stack name can be imported here. 
+    Type: String    
+
+
+Mappings: 
+ RegionMap:
+   us-west-2:
+    "HVM64":  "ami-094125af156557ca2" 
+   us-east-2:
+    "HVM64": "ami-0beaa649c482330f7" 
+   us-east-1:
+    "HVM64": "ami-0b0dcb5067f052a63" 
+   us-west-1:
+    "HVM64": "ami-0f5e8a042c8bfcd5e"  
+
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref KeyName  # Key name created in the region.
+      ImageId: !FindInMap [RegionMap, !Ref AWS::Region, "HVM64"]
+      InstanceType: !Ref InstanceType # import the type from the parameter 
+      SecurityGroupIds:  # import Security group fro the CLaudio template
+        # - !ImportValue
+        #     SampleNetworkCrossStack-SecurityGroupID   This can be choose or the second one
+         - Fn::ImportValue:
+            !Sub "${NetworkStackName}-SecurityGroupID"
+      SubnetId: # Import the Subnet ID from the SampleNetworkCroosStack template 
+        #  !ImportValue 'SampleNetworkCrossStack-SubnetID'
+          Fn::ImportValue:
+           !Sub "${NetworkStackName}-SubnetID"
+      UserData: !Base64 |
+          #!/bin/bash 
+          yum update -y
+          yum install httpd -y
+          systemctl start httpd
+          systemctl enable httpd
+          echo '<html> <head> <h2 style="font-size: 5rem; color:red">JOE BAHO CLOUD </h2> </head>
+               <body> <h1 style="font-size: 2rem; color: black"> You successfully access Joseph Mbatchou web page </h1>
+               <h1 style="font-size: 1.5rem; color: blue"> Welcome here and we hope you will enjoy! </h1> </body> </html> '  > /var/www/html/index.html
+      Tags:
+       - Key: Name
+         Value: webserver with Cross-stack-reference
+        
+  
+  MyEIP:
+    Type: AWS::EC2::EIP # Allocate an Elastic IP address
+    Properties:
+      InstanceId: !Ref MyEC2Instance  
+Outputs:     
+  PrivateIpAddress:
+   Description: Display the Private IPv4 of the EC2 MyEC2Instance
+   Value: !GetAtt MyEC2Instance.PrivateIp
+   Export: 
+    Name: !Sub '${AWS::StackName}-MyEC2Instance'
+  
+  PrivateDnsName:
+   Description: Display the Dns Name of the EC2 MyEC2Instance
+   Value: !GetAtt MyEC2Instance.PrivateDnsName
+   Export: 
+    Name: !Sub '${AWS::StackName}-MEC2Instance'
+
+  PublicDnsName:
+   Description: Display the Dns Name of the EC2 MyEC2Instance
+   Value: !GetAtt MyEC2Instance.PublicDnsName
+   Export: 
+    Name: !Sub '${AWS::StackName}-YEC2Instance'  
+
+
+
+
+
+
+
