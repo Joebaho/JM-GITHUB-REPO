@@ -29,8 +29,9 @@ Parameters:
     Description: Determine in which environement the person are 
     Type: String 
     AllowedValues: 
-      - Test
-      - Prod
+      - TEST
+      - PROD
+      - DIST 
 
 Resources:
   WebServer:
@@ -48,8 +49,8 @@ Resources:
           yum install -y httpd
           systemctl start httpd
           systemctl enable httpd
-          echo "<html><head> ${EnviType} Environement</head> 
-          <hr> <center><body><h1> Hello dear members of the ${EnviType} Departement in ${AWS::Region}<h1></body></center></html>" > /var/www/html/index.html
+          echo "<html><head> ${EnviType} ENVIRONMENT</head> 
+          <hr> <center><body><h1> HELLO </h1> <br> <h2> Welcome to all the members of the ${EnviType} Departement located in ${AWS::Region}</h2></body></center></html>" > /var/www/html/index.html
 
   WebServerSecurityGroup: #security group ID
     Type: AWS::EC2::SecurityGroup
@@ -74,10 +75,10 @@ Outputs:
    Description: Display the Dns Name of the EC2 MyEC2Instance
    Value: !GetAtt WebServer.PrivateDnsName
    Export: 
-    Name: !Sub '${AWS::StackName}-MEC2Instance'
+    Name: !Sub '${AWS::StackName}-PrivName'
 
   PublicDnsName:
    Description: Display the Dns Name of the EC2 MyEC2Instance
    Value: !GetAtt WebServer.PublicDnsName
    Export: 
-    Name: !Sub '${AWS::StackName}-YEC2Instance'    
+    Name: !Sub '${AWS::StackName}-PubName'    
